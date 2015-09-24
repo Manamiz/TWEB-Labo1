@@ -1,0 +1,157 @@
+<html>
+	
+	<head>
+		<meta charset="utf-8" />
+		<title>TWEB - Labo 1</title>
+
+		<link rel="stylesheet" href="bootstrap-3.3.5-dist/css/bootstrap.min.css">
+		<link rel="stylesheet" href="bootstrap-3.3.5-dist/css/bootstrap-theme.min.css">
+		<link rel="stylesheet" href="css/sticky-footer.css">
+	</head>
+
+	<body>
+		
+		<div class="container">
+			
+			<div class="page-header">
+				<h1>A first look at JS</h1>
+			</div>
+
+			<div class="panel panel-default" style="padding-top: 10px;">
+				<ul>
+					<li>When you move the mouse, the coordinates should be displayed in the sticky footer. </li>
+					<li>When you move the mouse, a person be created with random attributes.</li>
+					<li>The current time should be displayed in the Clock panel.</li>
+					<li>When you click on the "Show alert" button, a dialog should appear.</li>
+					<li>When you click on the "Toggle student" button, the panel should be hidden/shown.</li>
+				</ul>
+			</div>
+
+			
+			<div class="alert alert-info student">
+				<p>Hello, there !</p>
+			</div>
+
+			<div class="alert alert-info rooms">
+			</div>
+
+
+			<div class="panel panel-primary">
+				<div class="panel-heading">
+					<h3 class="panel-title">Clock</h3>
+				</div>
+				<div class="panel-body">
+					Thu Sep 17 2015 21:48:15 GMT+0200 (CEST)
+				</div>
+			</div>
+
+
+			<button type="button" class="btn btn-primary btn-lg show-alert">Show alert</button>
+
+			<button type="button" class="btn btn-default btn-lg toggle-student">Toggle student</button>
+
+
+		</div>
+
+
+		<footer class="footer">
+			<div class="container">
+				<p class="text-muted">0, 0</p>
+			</div>
+		</footer>
+
+		<script src="js/jquery-2.1.4.min.js"></script>
+		<script src="bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
+		<script src="js/chance.js"></script>
+		<script>
+
+		var KEY_SHIFT = 16;
+
+
+		function changeStudentDivColorByGender(gender) {
+			if(gender == "Male") {
+				$(".student").removeClass("alert-danger");
+				$(".student").addClass("alert-info");
+			}
+			else {
+				$(".student").removeClass("alert-info");
+				$(".student").addClass("alert-danger");
+			}
+		}
+
+		function showRandomStudent() {
+			var gender = chance.gender();
+			var name = chance.name({gender: gender});
+			
+			$(".student").html("<p>Hello, " + name + " (" + gender + ")</p>");
+			
+			changeStudentDivColorByGender(gender);
+		}
+
+		function addRandomStudent() {
+			var gender = chance.gender();
+			var name = chance.name({gender: gender});
+			
+			$(".student").append("<p>Hello, " + name + " (" + gender + ")</p>");
+		}
+
+		function updateDateTime() {
+			$(".panel-body").html(Date());
+		}
+
+		function showMouseCoordinatesInTheFooter(e) {
+			$("footer .text-muted").html(e.clientX + ", " + e.clientY);
+		}
+
+		$(document).ready(function() {
+
+			showRandomStudent();
+
+			updateDateTime();
+
+			// Charge le fichier json et ajoute les valeurs dans la div rooms
+			$.getJSON("rooms.json", function(data) {
+				$.each(data, function(key, val) {
+					$(".rooms").append("<p>Room: " + val[0] + ", " + val[1] + "</p>");
+				});
+			});
+
+
+			// Lorsqu'on bouge la souris
+			$(document).mousemove(function(e) {
+				showMouseCoordinatesInTheFooter(e);
+				showRandomStudent();
+			});
+
+			// Lorsqu'on appuie sur une touche
+			$(document).keydown(function(e) {
+				if(e.keyCode == KEY_SHIFT) {
+					addRandomStudent();
+				}
+			});
+
+			
+			// On affiche une alerte lors d'un clique sur le bouton show alert
+			$(".show-alert").click(function() {
+				alert("Hello");
+			});
+
+
+			// On affiche ou cache la div student lors d'un clique sur le bouton toggle student
+			$(".toggle-student").click(function() {
+				if($(".student").is(":visible"))
+					$(".student").hide("slow");
+				else
+					$(".student").show("slow");
+			});
+
+
+			// On update la date et l'heure chaque seconde
+			setInterval(updateDateTime, 1000);
+
+		});
+
+		</script>
+	</body>
+
+</html>
